@@ -14,6 +14,10 @@ create table if not exists public.items (
 
 alter table public.items enable row level security;
 
+-- Projetos novos do Supabase não liberam tabelas novas para a API automaticamente
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on table public.items to authenticated;
+
 drop policy if exists "items: ler os próprios"      on public.items;
 drop policy if exists "items: criar os próprios"    on public.items;
 drop policy if exists "items: alterar os próprios"  on public.items;

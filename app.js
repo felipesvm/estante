@@ -270,7 +270,7 @@ async function initStore() {
       console.warn(err);
       const c = err && err.code;
       toast(c === 'no_schema' ? 'A tabela da estante ainda não existe no Supabase. Rode o arquivo supabase/schema.sql no SQL Editor e recarregue a página.'
-        : c === 'not_granted' ? 'O Supabase recusou o acesso à estante. Rode de novo o arquivo supabase/schema.sql no SQL Editor e recarregue a página.'
+        : c === 'not_granted' ? 'O Supabase recusou o acesso à estante. Rode de novo o arquivo supabase/schema.sql no SQL Editor e recarregue a página. Detalhe: ' + ((err && err.message) || '')
         : c === 'unavailable' ? 'Sem conexão com o Supabase. Verifique a internet e recarregue a página.'
         : 'Não foi possível carregar a estante da nuvem. Detalhe: ' + ((err && err.message) || 'erro desconhecido'), { sticky: true });
     });

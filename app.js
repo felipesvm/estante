@@ -145,7 +145,8 @@ function sbErr(error) {
   e.code = st === '413' || /payload too large|exceeded the maximum|too large/i.test(e.message) ? 'too_large'
     : /quota/i.test(e.message) ? 'quota_or_state'
     : /fetch|network|timeout/i.test(e.message) ? 'unavailable'
-    : /row-level security|not allowed|unauthorized|jwt/i.test(e.message) ? 'not_granted' : 'upstream_error';
+    : /schema cache|does not exist|could not find the table|bucket not found/i.test(e.message) || st === 'PGRST205' || st === '42P01' ? 'no_schema'
+    : /row-level security|not allowed|unauthorized|jwt|permission denied/i.test(e.message) ? 'not_granted' : 'upstream_error';
   return e;
 }
 function makeCol() {
@@ -267,9 +268,11 @@ async function initStore() {
       if (!S.resumed) { S.resumed = true; resumeUploads(); }
     }, err => {
       console.warn(err);
-      toast(err && err.code === 'not_granted'
-        ? 'O banco do Supabase recusou o acesso. Confira se o arquivo supabase/schema.sql foi executado.'
-        : 'Não foi possível carregar a estante da nuvem. Verifique a conexão e recarregue a página.', { ms: 9000 });
+      const c = err && err.code;
+      toast(c === 'no_schema' ? 'A tabela da estante ainda não existe no Supabase. Rode o arquivo supabase/schema.sql no SQL Editor e recarregue a página.'
+        : c === 'not_granted' ? 'O Supabase recusou o acesso à estante. Rode de novo o arquivo supabase/schema.sql no SQL Editor e recarregue a página.'
+        : c === 'unavailable' ? 'Sem conexão com o Supabase. Verifique a internet e recarregue a página.'
+        : 'Não foi possível carregar a estante da nuvem. Detalhe: ' + ((err && err.message) || 'erro desconhecido'), { sticky: true });
     });
   } else {
     try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
@@ -338,7 +341,7 @@ async function uploadBook(id, onp) {
     b = S.books.get(id); if (b) { b.upload = 'failed'; persist(id); }
     const c = e && e.code;
     const msg = c === 'too_large' ? 'o arquivo passa do limite de tamanho por arquivo do Supabase'
-      : c === 'not_granted' ? 'o Supabase recusou o envio (confira se o schema.sql foi executado)'
+      : c === 'not_granted' || c === 'no_schema' ? 'o Supabase recusou o envio (confira se o schema.sql foi executado)'
       : c === 'quota_or_state' ? 'o espaço de armazenamento do Supabase está cheio'
       : c === 'rate_limited' ? 'muitos envios seguidos; tente de novo em instantes'
       : 'a conexão falhou';

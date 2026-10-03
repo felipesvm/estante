@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#EDEFE9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131715" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Biblioteca pessoal de PDFs e EPUBs com progresso e trechos sincronizados.">
+<title>Estante de Leitura</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,600;1,7..72,400&display=swap">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <aside class="side" id="side" aria-label="Navegação da estante"></aside>
+  <div class="scrim" id="scrim"></div>
+  <main class="main" id="main">
+    <div class="mtop">
+      <button class="ib" data-act="drawer" aria-label="Abrir menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+      <div class="brand" id="mbrand"></div>
+    </div>
+    <div class="main-inner" id="view">
+      <div class="boot"><div class="spinner"></div>Abrindo sua estante…</div>
+    </div>
+  </main>
+  <nav class="bnav" id="bnav" aria-label="Seções"></nav>
+</div>
+
+<section class="reader" id="reader" hidden aria-label="Leitor">
+  <div class="rbody">
+    <div class="pdfview" id="pdfView" hidden><div class="pages" id="pages"></div></div>
+    <div class="epubwrap" id="epubWrap" hidden>
+      <button class="pgbtn prev" id="ePrev" aria-label="Página anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="epubview" id="epubView"></div>
+      <button class="pgbtn next" id="eNext" aria-label="Próxima página"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="endnote" id="endNote" hidden><span>Você chegou ao fim do livro.</span><button id="markRead">Marcar como lido</button></div>
+    <div class="selpill" id="selPill" hidden>
+      <span>Salvar trecho</span>
+      <button class="cd" data-hlc="y" aria-label="Destacar em amarelo"><i style="background:#F2CF4A"></i></button>
+      <button class="cd" data-hlc="g" aria-label="Destacar em verde"><i style="background:#9ED6A8"></i></button>
+      <button class="cd" data-hlc="p" aria-label="Destacar em rosa"><i style="background:#F2AEC6"></i></button>
+      <button class="cd" data-hlc="b" aria-label="Destacar em azul"><i style="background:#A7CBEE"></i></button>
+      <button class="nb" data-hlc="note">+ Nota</button>
+    </div>
+    <aside class="rpanel" id="rPanel" hidden>
+      <header><h3 id="rpTitle"></h3><button class="ib" id="rpClose" aria-label="Fechar painel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+      <div class="rpbody" id="rpBody"></div>
+    </aside>
+    <div class="rload" id="rLoad"><div class="spinner"></div><p id="rLoadMsg">Abrindo…</p><button class="btn sm" id="rLoadBack" hidden>Voltar à estante</button></div>
+  </div>
+  <header class="rtop">
+    <button class="rback" id="rBack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>Estante</button>
+    <div class="rtitle"><b id="rTitle"></b><span id="rAuthor"></span></div>
+    <button class="ib" data-panel="toc" aria-label="Sumário"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg></button>
+    <button class="ib" data-panel="hls" aria-label="Trechos salvos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4.5l5 5L10 19H5v-5z"/><path d="M4 21h16"/></svg></button>
+    <button class="ib aa" data-panel="set" aria-label="Ajustes de leitura">Aa</button>
+  </header>
+  <button class="rfloat" id="rShow" aria-label="Mostrar menu do leitor"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <footer class="rbot">
+    <div class="rprog">
+      <input type="range" id="rRange" min="0" max="1000" value="0" aria-label="Posição no livro">
+      <div class="rinfo"><span id="rLeft"></span><span id="rRight"></span></div>
+    </div>
+  </footer>
+</section>
+
+<div class="modal" id="modal" hidden></div>
+<div id="toasts" aria-live="polite"></div>
+<div id="drop" hidden><div>Solte para adicionar à estante</div></div>
+<input type="file" id="fileIn" class="sr" accept=".pdf,.epub,application/pdf,application/epub+zip" multiple>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
